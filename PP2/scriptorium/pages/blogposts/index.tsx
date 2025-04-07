@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Link from "next/link";
-import UserAvatar from "../components/user-avatar";
+import UserAvatar from "../../components/user-avatar";
 
 interface BlogPost {
   id: number;
@@ -12,7 +12,7 @@ interface BlogPost {
   upvotes: number;
   downvotes: number;
   templates: { id: number; title: string }[];
-  user: { firstName: string; lastName: string; id: number; avatar: string; };
+  user: { firstName: string; lastName: string; id: number; avatar: string };
   report_count: number;
   isHidden: boolean;
   ratings: { userId: number; votetype: string }[];
@@ -82,13 +82,15 @@ const BlogPostList: React.FC = () => {
 
   const extractVoteTypes = (blogPosts: BlogPost[], userId: number) => {
     blogPosts.forEach((blogPost: BlogPost) => {
-      blogPost.ratings.forEach((rating: { userId: number; votetype: string}) => {
-        if (rating.userId === userId) {
-          blogPost.userVote = rating.votetype;
+      blogPost.ratings.forEach(
+        (rating: { userId: number; votetype: string }) => {
+          if (rating.userId === userId) {
+            blogPost.userVote = rating.votetype;
+          }
         }
-      })
-    })
-  } 
+      );
+    });
+  };
 
   const fetchBlogPosts = async () => {
     setLoading(true);
@@ -249,7 +251,7 @@ const BlogPostList: React.FC = () => {
                     votetype === "DOWNVOTE"
                       ? post.downvotes + 1
                       : post.downvotes - 1,
-                  userVote: votetype
+                  userVote: votetype,
                 }
               : post
           )
@@ -268,7 +270,7 @@ const BlogPostList: React.FC = () => {
                     votetype === "DOWNVOTE"
                       ? post.downvotes - 1
                       : post.downvotes,
-                  userVote: null
+                  userVote: null,
                 }
               : post
           )
@@ -288,7 +290,7 @@ const BlogPostList: React.FC = () => {
                     votetype === "DOWNVOTE"
                       ? post.downvotes + 1
                       : post.downvotes,
-                  userVote: votetype
+                  userVote: votetype,
                 }
               : post
           )
@@ -325,7 +327,9 @@ const BlogPostList: React.FC = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <label className="text-sm font-medium text-muted-foreground">Title</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Title
+              </label>
               <input
                 type="text"
                 placeholder="Search by title"
@@ -335,17 +339,23 @@ const BlogPostList: React.FC = () => {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-muted-foreground">Description</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Description
+              </label>
               <input
                 type="text"
                 placeholder="Search by description"
                 value={searchParams.description}
-                onChange={(e) => handleSearchChange("description", e.target.value)}
+                onChange={(e) =>
+                  handleSearchChange("description", e.target.value)
+                }
                 className="w-full p-2 bg-background border border-border rounded-md focus:ring-2 focus:ring-ring text-foreground placeholder:text-muted-foreground transition-colors duration-200"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-muted-foreground">Tag</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Tag
+              </label>
               <input
                 type="text"
                 placeholder="Search by tag"
@@ -355,7 +365,9 @@ const BlogPostList: React.FC = () => {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-muted-foreground">Content</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Content
+              </label>
               <input
                 type="text"
                 placeholder="Search by content"
@@ -365,12 +377,16 @@ const BlogPostList: React.FC = () => {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-muted-foreground">Template</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Template
+              </label>
               <input
                 type="text"
                 placeholder="Search by template"
                 value={searchParams.templateTitle}
-                onChange={(e) => handleSearchChange("templateTitle", e.target.value)}
+                onChange={(e) =>
+                  handleSearchChange("templateTitle", e.target.value)
+                }
                 className="w-full p-2 bg-background border border-border rounded-md focus:ring-2 focus:ring-ring text-foreground placeholder:text-muted-foreground transition-colors duration-200"
               />
             </div>
@@ -378,10 +394,16 @@ const BlogPostList: React.FC = () => {
               {isAdmin ? (
                 <div className="flex space-x-2">
                   <div className="flex-1">
-                    <label className="text-sm font-medium text-muted-foreground">Sort by</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Sort by
+                    </label>
                     <select
                       value={sortBy}
-                      onChange={(e) => handleSortTypeChange(e.target.value as "rating" | "reports")}
+                      onChange={(e) =>
+                        handleSortTypeChange(
+                          e.target.value as "rating" | "reports"
+                        )
+                      }
                       className="w-full p-2 bg-background border border-border rounded-md focus:ring-2 focus:ring-ring text-foreground transition-colors duration-200"
                     >
                       <option value="rating">Rating</option>
@@ -389,24 +411,32 @@ const BlogPostList: React.FC = () => {
                     </select>
                   </div>
                   <div className="flex-1">
-                    <label className="text-sm font-medium text-muted-foreground">Order</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Order
+                    </label>
                     <select
                       value={sortOrder}
                       onChange={(e) => setSortOrder(e.target.value)}
                       className="w-full p-2 bg-background border border-border rounded-md focus:ring-2 focus:ring-ring text-foreground transition-colors duration-200"
                     >
                       <option value="desc">
-                        {sortBy === "reports" ? "Most Reported" : "Highest Rated"}
+                        {sortBy === "reports"
+                          ? "Most Reported"
+                          : "Highest Rated"}
                       </option>
                       <option value="asc">
-                        {sortBy === "reports" ? "Least Reported" : "Lowest Rated"}
+                        {sortBy === "reports"
+                          ? "Least Reported"
+                          : "Lowest Rated"}
                       </option>
                     </select>
                   </div>
                 </div>
               ) : (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Sort by Rating</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Sort by Rating
+                  </label>
                   <select
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value)}
@@ -450,7 +480,8 @@ const BlogPostList: React.FC = () => {
                     <div className="flex flex-wrap gap-2 mb-2">
                       {isAdmin && post.report_count > 0 && (
                         <span className="inline-flex items-center px-2 py-1 bg-destructive/10 text-destructive rounded-full text-xs font-medium">
-                          🚩 {post.report_count} report{post.report_count !== 1 ? "s" : ""}
+                          🚩 {post.report_count} report
+                          {post.report_count !== 1 ? "s" : ""}
                         </span>
                       )}
                       {post.isHidden && (
@@ -494,34 +525,37 @@ const BlogPostList: React.FC = () => {
                       <button
                         onClick={() => handleToggleHide(post.id, post.isHidden)}
                         className={`inline-flex items-center px-3 py-1 rounded-md transition-colors duration-200
-                          ${post.isHidden 
-                            ? 'bg-primary/10 text-primary hover:bg-primary/20' 
-                            : 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+                          ${
+                            post.isHidden
+                              ? "bg-primary/10 text-primary hover:bg-primary/20"
+                              : "bg-destructive/10 text-destructive hover:bg-destructive/20"
                           }`}
                       >
                         {post.isHidden ? "👁️ Unhide" : "🚫 Hide"} Post
                       </button>
                     )}
                     <button
-                    onClick={() => handleVote(post.id, "UPVOTE")}
-                    className={`inline-flex items-center px-3 py-1 rounded-md transition-colors duration-200
-                      ${post.userVote === "UPVOTE"
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "bg-primary/10 text-primary hover:bg-primary/20"
+                      onClick={() => handleVote(post.id, "UPVOTE")}
+                      className={`inline-flex items-center px-3 py-1 rounded-md transition-colors duration-200
+                      ${
+                        post.userVote === "UPVOTE"
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "bg-primary/10 text-primary hover:bg-primary/20"
                       }`}
-                  >
-                    👍 {post.upvotes}
-                  </button>
-                  <button
-                    onClick={() => handleVote(post.id, "DOWNVOTE")}
-                    className={`inline-flex items-center px-3 py-1 rounded-md transition-colors duration-200
-                      ${post.userVote === "DOWNVOTE"
-                        ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        : "bg-destructive/10 text-destructive hover:bg-destructive/20"
+                    >
+                      👍 {post.upvotes}
+                    </button>
+                    <button
+                      onClick={() => handleVote(post.id, "DOWNVOTE")}
+                      className={`inline-flex items-center px-3 py-1 rounded-md transition-colors duration-200
+                      ${
+                        post.userVote === "DOWNVOTE"
+                          ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          : "bg-destructive/10 text-destructive hover:bg-destructive/20"
                       }`}
-                  >
-                    👎 {post.downvotes}
-                  </button>
+                    >
+                      👎 {post.downvotes}
+                    </button>
                   </div>
                 </div>
               </div>

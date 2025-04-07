@@ -2,20 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Link from "next/link";
-import UserAvatar from "../components/user-avatar";
+import UserAvatar from "../../components/user-avatar";
 
 interface Comment {
   id: number;
   content: string;
   upvotes: number;
   downvotes: number;
-  user: { firstName: string, lastName: string, id: number, avatar: string };
+  user: { firstName: string; lastName: string; id: number; avatar: string };
   children: Comment[];
   parentId: number | null;
   report_count: number;
   isHidden: boolean;
   userVote: string | null;
-  ratings: { userId: number; votetype: string}[];
+  ratings: { userId: number; votetype: string }[];
 }
 
 interface BlogPost {
@@ -26,7 +26,7 @@ interface BlogPost {
   upvotes: number;
   downvotes: number;
   templates: { id: number; title: string }[];
-  user: { firstName: string; lastName: string, id: number, avatar: string };
+  user: { firstName: string; lastName: string; id: number; avatar: string };
   comments: Comment[];
   isHidden: boolean;
   ratings: { userId: number; votetype: string }[];
@@ -36,26 +36,31 @@ interface ReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (content: string) => Promise<void>;
-  type: 'post' | 'comment';
+  type: "post" | "comment";
 }
 
-const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, onSubmit, type }) => {
-  const [reportContent, setReportContent] = useState('');
+const ReportModal: React.FC<ReportModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  type,
+}) => {
+  const [reportContent, setReportContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     if (!reportContent.trim()) {
-      alert('Please provide a reason for your report');
+      alert("Please provide a reason for your report");
       return;
     }
 
     setIsSubmitting(true);
     try {
       await onSubmit(reportContent);
-      setReportContent('');
+      setReportContent("");
       onClose();
     } catch (error) {
-      console.error('Failed to submit report:', error);
+      console.error("Failed to submit report:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -86,7 +91,7 @@ const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, onSubmit, ty
             className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Report'}
+            {isSubmitting ? "Submitting..." : "Submit Report"}
           </button>
         </div>
       </div>
@@ -106,7 +111,10 @@ interface CommentComponentProps {
   onReplyContentChange: (content: string) => void;
   expandedComments: Set<number>;
   onToggleReplies: (commentId: number) => void;
-  onToggleHide: (commentId: number, currentHiddenState: boolean) => Promise<void>;
+  onToggleHide: (
+    commentId: number,
+    currentHiddenState: boolean
+  ) => Promise<void>;
   isAdmin: boolean;
   currentUserId: number | null;
 }
@@ -143,7 +151,8 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
         <div className="flex items-center space-x-2 ml-4">
           {isAdmin && comment.report_count > 0 && (
             <span className="px-2 py-1 bg-destructive/10 text-destructive rounded-full text-xs font-medium">
-              🚩 {comment.report_count} report{comment.report_count !== 1 ? 's' : ''}
+              🚩 {comment.report_count} report
+              {comment.report_count !== 1 ? "s" : ""}
             </span>
           )}
           {comment.isHidden && (isAdmin || isAuthor) && (
@@ -158,7 +167,9 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
       {shouldShow ? (
         <p className="text-foreground ml-10 mb-3">{comment.content}</p>
       ) : (
-        <p className="text-muted-foreground ml-10 mb-3 italic">This comment is hidden.</p>
+        <p className="text-muted-foreground ml-10 mb-3 italic">
+          This comment is hidden.
+        </p>
       )}
 
       {/* Comment Actions */}
@@ -167,12 +178,13 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
           <button
             onClick={() => onToggleHide(comment.id, comment.isHidden)}
             className={`inline-flex items-center px-2 py-1 rounded transition-colors duration-200 text-sm
-              ${comment.isHidden 
-                ? 'bg-primary/10 text-primary hover:bg-primary/20' 
-                : 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+              ${
+                comment.isHidden
+                  ? "bg-primary/10 text-primary hover:bg-primary/20"
+                  : "bg-destructive/10 text-destructive hover:bg-destructive/20"
               }`}
           >
-            {comment.isHidden ? '👁️ Unhide' : '🚫 Hide'}
+            {comment.isHidden ? "👁️ Unhide" : "🚫 Hide"}
           </button>
         )}
         {shouldShow && (
@@ -180,9 +192,10 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
             <button
               onClick={() => onVote(comment.id, "UPVOTE")}
               className={`inline-flex items-center px-2 py-1 rounded transition-colors duration-200 text-sm
-                ${comment.userVote === "UPVOTE"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "bg-primary/10 text-primary hover:bg-primary/20"
+                ${
+                  comment.userVote === "UPVOTE"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-primary/10 text-primary hover:bg-primary/20"
                 }`}
             >
               👍 {comment.upvotes}
@@ -190,9 +203,10 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
             <button
               onClick={() => onVote(comment.id, "DOWNVOTE")}
               className={`inline-flex items-center px-2 py-1 rounded transition-colors duration-200 text-sm
-                ${comment.userVote === "DOWNVOTE"
-                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  : "bg-destructive/10 text-destructive hover:bg-destructive/20"
+                ${
+                  comment.userVote === "DOWNVOTE"
+                    ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    : "bg-destructive/10 text-destructive hover:bg-destructive/20"
                 }`}
             >
               👎 {comment.downvotes}
@@ -247,7 +261,9 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
             onClick={() => onToggleReplies(comment.id)}
             className="text-primary hover:text-primary/80 text-sm font-medium transition-colors duration-200"
           >
-            {expandedComments.has(comment.id) ? "▼" : "▶"} {comment.children.length} {comment.children.length > 1 ? "Replies" : "Reply"}
+            {expandedComments.has(comment.id) ? "▼" : "▶"}{" "}
+            {comment.children.length}{" "}
+            {comment.children.length > 1 ? "Replies" : "Reply"}
           </button>
 
           {expandedComments.has(comment.id) && (
@@ -279,8 +295,6 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
   );
 };
 
-
-
 const BlogPostDetail: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -289,7 +303,9 @@ const BlogPostDetail: React.FC = () => {
   const [newComment, setNewComment] = useState<string>(""); // For adding new comments
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set()); // Track expanded comments
+  const [expandedComments, setExpandedComments] = useState<Set<number>>(
+    new Set()
+  ); // Track expanded comments
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState<string>("");
@@ -297,7 +313,9 @@ const BlogPostDetail: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>("rating");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showReportModal, setShowReportModal] = useState(false);
-  const [reportingCommentId, setReportingCommentId] = useState<number | null>(null);
+  const [reportingCommentId, setReportingCommentId] = useState<number | null>(
+    null
+  );
   const [userVote, setUserVote] = useState<string | null>(null);
 
   const handleReport = async (content: string) => {
@@ -313,9 +331,9 @@ const BlogPostDetail: React.FC = () => {
 
       await axios.post(
         `/api/reports`,
-        { 
-          blogPostId: blogPost.id, 
-          content: content 
+        {
+          blogPostId: blogPost.id,
+          content: content,
         },
         {
           headers: {
@@ -329,7 +347,10 @@ const BlogPostDetail: React.FC = () => {
       if (err.status === 409) {
         alert("You have already reported this post");
       }
-      console.error("Failed to report the post:", err.response?.data?.error || err.message);
+      console.error(
+        "Failed to report the post:",
+        err.response?.data?.error || err.message
+      );
       throw err;
     }
   };
@@ -357,7 +378,10 @@ const BlogPostDetail: React.FC = () => {
       if (err.status === 409) {
         alert("You have already reported this comment");
       }
-      console.error("Failed to report the comment:", err.response?.data?.error || err.message);
+      console.error(
+        "Failed to report the comment:",
+        err.response?.data?.error || err.message
+      );
       throw err;
     }
   };
@@ -367,7 +391,6 @@ const BlogPostDetail: React.FC = () => {
     setReportingCommentId(commentId);
     setShowReportModal(true);
   };
-
 
   const processComments = (blogPostData: BlogPost) => {
     // Organize comments into a hierarchical structure
@@ -385,25 +408,31 @@ const BlogPostDetail: React.FC = () => {
     });
 
     // Extract top-level comments
-    blogPostData.comments = blogPostData.comments.map((comment: Comment) => commentsById[comment.id]);
-    console.log(blogPostData.comments)
-  }
+    blogPostData.comments = blogPostData.comments.map(
+      (comment: Comment) => commentsById[comment.id]
+    );
+    console.log(blogPostData.comments);
+  };
 
   const extractUserVote = (blogPostData: BlogPost, userId: number) => {
-    blogPostData.ratings.forEach((rating: { userId : number, votetype: string }) => {
-      if (rating.userId === userId) {
-        setUserVote(rating.votetype);
+    blogPostData.ratings.forEach(
+      (rating: { userId: number; votetype: string }) => {
+        if (rating.userId === userId) {
+          setUserVote(rating.votetype);
+        }
       }
-    });
+    );
 
     blogPostData.comments.forEach((comment: Comment) => {
-      comment.ratings.forEach((rating: { userId: number; votetype: string }) => {
-        if (rating.userId === userId) {
-          comment.userVote = rating.votetype;
+      comment.ratings.forEach(
+        (rating: { userId: number; votetype: string }) => {
+          if (rating.userId === userId) {
+            comment.userVote = rating.votetype;
+          }
         }
-      })
+      );
     });
-  }
+  };
 
   const fetchBlogPost = async () => {
     let accessToken = localStorage.getItem("accessToken"); // Or wherever you store the token
@@ -412,31 +441,28 @@ const BlogPostDetail: React.FC = () => {
     try {
       setLoading(true);
       if (accessToken) {
-        var response = await axios.get(`/api/blogposts/${id}`, 
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-            params: {
-              sortOrder,
-              sortBy
-            }
-          }
-        );
+        var response = await axios.get(`/api/blogposts/${id}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            sortOrder,
+            sortBy,
+          },
+        });
         currentUser = await axios.get(`/api/users/me`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
         setCurrentUserId(currentUser.data.id);
-        setIsAdmin(currentUser.data.role === 'ADMIN');
-      }
-      else {
+        setIsAdmin(currentUser.data.role === "ADMIN");
+      } else {
         var response = await axios.get(`/api/blogposts/${id}`, {
           params: {
-            sortOrder
-          }
-        })
+            sortOrder,
+          },
+        });
       }
       let blogPostData = response.data.blogPost;
       processComments(blogPostData);
@@ -448,21 +474,19 @@ const BlogPostDetail: React.FC = () => {
       if (err.status === 401) {
         if (refreshToken) {
           try {
-            response = await axios.post('/api/users/refresh', { refreshToken });
+            response = await axios.post("/api/users/refresh", { refreshToken });
             accessToken = response.data.accessToken;
             if (accessToken) {
               localStorage.setItem("accessToken", accessToken);
-              response = await axios.get(`/api/blogposts/${id}`, 
-                {
-                  headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                  },
-                  params: {
-                    sortOrder,
-                    sortBy
-                  }
-                }
-              );
+              response = await axios.get(`/api/blogposts/${id}`, {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
+                params: {
+                  sortOrder,
+                  sortBy,
+                },
+              });
               let blogPostData = response.data.blogPost;
               processComments(blogPostData);
               setBlogPost(blogPostData);
@@ -473,30 +497,26 @@ const BlogPostDetail: React.FC = () => {
                 },
               });
               setCurrentUserId(currentUser.data.id);
-              setIsAdmin(currentUser.data.role === 'ADMIN');
+              setIsAdmin(currentUser.data.role === "ADMIN");
               extractUserVote(blogPostData, currentUser.data.id);
-
             }
-          }
-          catch (err: any) {
+          } catch (err: any) {
             try {
               response = await axios.get(`/api/blogposts/${id}`, {
                 params: {
                   sortOrder,
-                  sortBy
-                }
+                  sortBy,
+                },
               });
               let blogPostData = response.data.blogPost;
-              processComments(blogPostData)
+              processComments(blogPostData);
               setBlogPost(blogPostData);
-            } 
-            catch (err: any) {
+            } catch (err: any) {
               setError("Failed to load the blog post. Please try again later.");
             }
           }
         }
-      }
-      else {
+      } else {
         setError("Failed to load the blog post. Please try again later.");
       }
     } finally {
@@ -525,38 +545,53 @@ const BlogPostDetail: React.FC = () => {
 
       // Updated existing rating
       if (res.status === 200) {
-        const newBlogPost = { 
-          ...blogPost, 
-          upvotes: votetype === "UPVOTE" ? blogPost.upvotes + 1 : blogPost.upvotes - 1,
-          downvotes: votetype === "DOWNVOTE" ? blogPost.downvotes + 1 : blogPost.downvotes - 1,
-        }
+        const newBlogPost = {
+          ...blogPost,
+          upvotes:
+            votetype === "UPVOTE" ? blogPost.upvotes + 1 : blogPost.upvotes - 1,
+          downvotes:
+            votetype === "DOWNVOTE"
+              ? blogPost.downvotes + 1
+              : blogPost.downvotes - 1,
+        };
         setUserVote(votetype);
         setBlogPost(newBlogPost);
-      } 
+      }
 
       // Undo previous rating
       if (res.status === 201) {
-        const newBlogPost = { 
-          ...blogPost, 
-          upvotes: votetype === "UPVOTE" ? blogPost.upvotes - 1 : blogPost.upvotes,
-          downvotes: votetype === "DOWNVOTE" ? blogPost.downvotes - 1 : blogPost.downvotes
-        }
+        const newBlogPost = {
+          ...blogPost,
+          upvotes:
+            votetype === "UPVOTE" ? blogPost.upvotes - 1 : blogPost.upvotes,
+          downvotes:
+            votetype === "DOWNVOTE"
+              ? blogPost.downvotes - 1
+              : blogPost.downvotes,
+        };
         setUserVote(null);
         setBlogPost(newBlogPost);
       }
 
       // Created new rating
       if (res.status === 202) {
-        const newBlogPost = { 
-          ...blogPost, 
-          upvotes: votetype === "UPVOTE" ? blogPost.upvotes + 1 : blogPost.upvotes,
-          downvotes: votetype === "DOWNVOTE" ? blogPost.downvotes + 1 : blogPost.downvotes,
-        }
+        const newBlogPost = {
+          ...blogPost,
+          upvotes:
+            votetype === "UPVOTE" ? blogPost.upvotes + 1 : blogPost.upvotes,
+          downvotes:
+            votetype === "DOWNVOTE"
+              ? blogPost.downvotes + 1
+              : blogPost.downvotes,
+        };
         setUserVote(votetype);
         setBlogPost(newBlogPost);
       }
     } catch (err: any) {
-      console.error("Failed to rate the post:", err.response?.data?.error || err.message);
+      console.error(
+        "Failed to rate the post:",
+        err.response?.data?.error || err.message
+      );
     }
   };
 
@@ -565,14 +600,14 @@ const BlogPostDetail: React.FC = () => {
       alert("Comment cannot be empty.");
       return;
     }
-  
+
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) {
         alert("You need to log in to comment.");
         return;
       }
-  
+
       const response = await axios.post(
         `/api/comments`,
         { blogPostId: blogPost?.id, content: newComment },
@@ -580,74 +615,78 @@ const BlogPostDetail: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       // Add the new comment to the state
       if (blogPost) {
         const newCommentData = response.data.newComment;
         console.log(newCommentData);
         const updatedBlogPost = {
           ...blogPost,
-          comments: [...blogPost.comments, newCommentData]
+          comments: [...blogPost.comments, newCommentData],
         };
         processComments(updatedBlogPost);
         console.log(updatedBlogPost);
         setBlogPost(updatedBlogPost);
       }
-      
+
       setNewComment(""); // Clear the input field
-    }
-    catch (err: any) {
-      console.error("Failed to post comment:", err.response?.data?.error || err.message);
+    } catch (err: any) {
+      console.error(
+        "Failed to post comment:",
+        err.response?.data?.error || err.message
+      );
     }
   };
-  
+
   const postReply = async (parentId: number) => {
     if (!replyContent.trim()) {
       alert("Reply cannot be empty.");
       return;
     }
-  
+
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) {
         alert("You need to log in to comment.");
         return;
       }
-  
+
       const response = await axios.post(
         `/api/comments`,
-        { 
-          blogPostId: blogPost?.id, 
+        {
+          blogPostId: blogPost?.id,
           content: replyContent,
-          parentId 
+          parentId,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       // Add the new reply to the state
       if (blogPost) {
         const newReply = response.data.newComment;
         const updatedBlogPost = {
           ...blogPost,
-          comments: [...blogPost.comments, newReply]
+          comments: [...blogPost.comments, newReply],
         };
         processComments(updatedBlogPost);
         setBlogPost(updatedBlogPost);
       }
-  
+
       // Reset states
       setReplyingTo(null);
       setReplyContent("");
-    }
-    catch (err: any) {
-      console.error("Failed to post reply:", err.response?.data?.error || err.message);
+    } catch (err: any) {
+      console.error(
+        "Failed to post reply:",
+        err.response?.data?.error || err.message
+      );
     }
   };
 
   const toggleReplies = (commentId: number) => {
-    console.log(commentId)
+    console.log(commentId);
     console.log(blogPost?.comments);
     setExpandedComments((prev) => {
       const updated = new Set(prev);
@@ -678,7 +717,9 @@ const BlogPostDetail: React.FC = () => {
   };
 
   const handleDelete = async () => {
-    const confirmDelete = confirm("Are you sure you want to delete this blog post?");
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this blog post?"
+    );
     if (!confirmDelete) return;
 
     try {
@@ -691,7 +732,10 @@ const BlogPostDetail: React.FC = () => {
       alert("Blog post deleted successfully!");
       router.push("/blogposts"); // Redirect to blog post list
     } catch (err: any) {
-      console.error("Failed to delete the blog post:", err.response?.data?.error || err.message);
+      console.error(
+        "Failed to delete the blog post:",
+        err.response?.data?.error || err.message
+      );
       alert("Failed to delete the blog post. Please try again.");
     }
   };
@@ -703,7 +747,7 @@ const BlogPostDetail: React.FC = () => {
         alert("You need to log in to vote");
         return;
       }
-  
+
       const res = await axios.post(
         `/api/ratings`,
         { votetype, commentId },
@@ -713,37 +757,53 @@ const BlogPostDetail: React.FC = () => {
           },
         }
       );
-  
+
       if (res.status === 200 || res.status === 201 || res.status === 202) {
         setBlogPost((prevBlogPost) => {
           if (!prevBlogPost) return null;
-  
+
           // Helper function to update comment in nested structure
           const updateCommentVotes = (comments: Comment[]): Comment[] => {
-            return comments.map(comment => {
+            return comments.map((comment) => {
               if (comment.id === commentId) {
                 if (res.status === 200) {
                   return {
                     ...comment,
-                    upvotes: votetype === "UPVOTE" ? comment.upvotes + 1 : comment.upvotes - 1,
-                    downvotes: votetype === "DOWNVOTE" ? comment.downvotes + 1 : comment.downvotes - 1,
-                    userVote: votetype
+                    upvotes:
+                      votetype === "UPVOTE"
+                        ? comment.upvotes + 1
+                        : comment.upvotes - 1,
+                    downvotes:
+                      votetype === "DOWNVOTE"
+                        ? comment.downvotes + 1
+                        : comment.downvotes - 1,
+                    userVote: votetype,
                   };
-                }
-                else if (res.status === 201) {
+                } else if (res.status === 201) {
                   return {
                     ...comment,
-                    upvotes: votetype === "UPVOTE" ? comment.upvotes - 1 : comment.upvotes,
-                    downvotes: votetype === "DOWNVOTE" ? comment.downvotes - 1 : comment.downvotes,
-                    userVote: null
+                    upvotes:
+                      votetype === "UPVOTE"
+                        ? comment.upvotes - 1
+                        : comment.upvotes,
+                    downvotes:
+                      votetype === "DOWNVOTE"
+                        ? comment.downvotes - 1
+                        : comment.downvotes,
+                    userVote: null,
                   };
-                }
-                else {
+                } else {
                   return {
                     ...comment,
-                    upvotes: votetype === "UPVOTE" ? comment.upvotes + 1 : comment.upvotes,
-                    downvotes: votetype === "DOWNVOTE" ? comment.downvotes + 1 : comment.downvotes,
-                    userVote: votetype
+                    upvotes:
+                      votetype === "UPVOTE"
+                        ? comment.upvotes + 1
+                        : comment.upvotes,
+                    downvotes:
+                      votetype === "DOWNVOTE"
+                        ? comment.downvotes + 1
+                        : comment.downvotes,
+                    userVote: votetype,
                   };
                 }
               }
@@ -753,7 +813,7 @@ const BlogPostDetail: React.FC = () => {
               };
             });
           };
-  
+
           return {
             ...prevBlogPost,
             comments: updateCommentVotes(prevBlogPost.comments),
@@ -761,18 +821,24 @@ const BlogPostDetail: React.FC = () => {
         });
       }
     } catch (err: any) {
-      console.error("Failed to rate the comment:", err.response?.data?.error || err.message);
+      console.error(
+        "Failed to rate the comment:",
+        err.response?.data?.error || err.message
+      );
     }
   };
 
-  const handleCommentToggleHide = async (commentId: number, currentHiddenState: boolean) => {
+  const handleCommentToggleHide = async (
+    commentId: number,
+    currentHiddenState: boolean
+  ) => {
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) {
         alert("You need to be logged in");
         return;
       }
-  
+
       const response = await axios.put(
         `/api/comments/${commentId}`,
         { isHidden: !currentHiddenState },
@@ -782,65 +848,71 @@ const BlogPostDetail: React.FC = () => {
           },
         }
       );
-      console.log(response)
-  
+      console.log(response);
+
       setBlogPost((prevBlogPost) => {
         if (!prevBlogPost) return null;
-  
+
         const updateCommentVisibility = (comments: Comment[]): Comment[] => {
-          return comments.map(comment => {
+          return comments.map((comment) => {
             if (comment.id === commentId) {
               return {
                 ...comment,
-                isHidden: !currentHiddenState
+                isHidden: !currentHiddenState,
               };
             }
             return {
               ...comment,
-              children: updateCommentVisibility(comment.children)
+              children: updateCommentVisibility(comment.children),
             };
           });
         };
-  
+
         return {
           ...prevBlogPost,
-          comments: updateCommentVisibility(prevBlogPost.comments)
+          comments: updateCommentVisibility(prevBlogPost.comments),
         };
       });
     } catch (err: any) {
-      console.error("Failed to update comment visibility:", err.response?.data?.error || err.message);
+      console.error(
+        "Failed to update comment visibility:",
+        err.response?.data?.error || err.message
+      );
       alert("Failed to update comment visibility. Please try again.");
     }
   };
-  
+
   useEffect(() => {
     if (id) {
       fetchBlogPost();
     }
   }, [id, sortOrder, sortBy]);
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>
-  );
-  
-  if (error) return (
-    <div className="max-w-4xl mx-auto mt-8 bg-card rounded-lg shadow-md p-6">
-      <div className="text-destructive flex items-center justify-center">
-        <span className="mr-2">⚠️</span>
-        {error}
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    </div>
-  );
-  
-  if (!blogPost) return (
-    <div className="max-w-4xl mx-auto mt-8 bg-card rounded-lg shadow-md p-6">
-      <div className="text-muted-foreground flex items-center justify-center">
-        No blog post found.
+    );
+
+  if (error)
+    return (
+      <div className="max-w-4xl mx-auto mt-8 bg-card rounded-lg shadow-md p-6">
+        <div className="text-destructive flex items-center justify-center">
+          <span className="mr-2">⚠️</span>
+          {error}
+        </div>
       </div>
-    </div>
-  );
+    );
+
+  if (!blogPost)
+    return (
+      <div className="max-w-4xl mx-auto mt-8 bg-card rounded-lg shadow-md p-6">
+        <div className="text-muted-foreground flex items-center justify-center">
+          No blog post found.
+        </div>
+      </div>
+    );
 
   const isOwner = blogPost.user.id === currentUserId;
 
@@ -852,7 +924,9 @@ const BlogPostDetail: React.FC = () => {
           {/* Header */}
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-card-foreground mb-2">{blogPost.title}</h1>
+              <h1 className="text-3xl font-bold text-card-foreground mb-2">
+                {blogPost.title}
+              </h1>
               <div className="text-sm text-muted-foreground space-y-2">
                 <div className="flex items-center">
                   <UserAvatar user={blogPost.user} />
@@ -865,16 +939,16 @@ const BlogPostDetail: React.FC = () => {
                 </span>
               </div>
             </div>
-            
+
             {isOwner && !blogPost.isHidden && (
               <div className="flex space-x-2">
-                <button 
+                <button
                   onClick={() => router.push(`/blogposts/edit/${id}`)}
                   className="inline-flex items-center px-3 py-2 border border-border rounded-md text-sm font-medium text-muted-foreground bg-card hover:bg-muted transition-colors duration-200"
                 >
                   ✏️ Edit
                 </button>
-                <button 
+                <button
                   onClick={handleDelete}
                   className="inline-flex items-center px-3 py-2 border border-destructive rounded-md text-sm font-medium text-destructive bg-card hover:bg-destructive/10 transition-colors duration-200"
                 >
@@ -892,11 +966,13 @@ const BlogPostDetail: React.FC = () => {
           {/* Linked Templates */}
           {blogPost.templates.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-lg font-semibold text-card-foreground mb-2">Linked Templates</h3>
+              <h3 className="text-lg font-semibold text-card-foreground mb-2">
+                Linked Templates
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {blogPost.templates.map((template) => (
-                  <Link 
-                    key={template.id} 
+                  <Link
+                    key={template.id}
                     href={`/templates/${template.id}`}
                     className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors duration-200"
                   >
@@ -913,9 +989,10 @@ const BlogPostDetail: React.FC = () => {
             <button
               onClick={() => handleVote("UPVOTE")}
               className={`inline-flex items-center px-4 py-2 rounded-md transition-colors duration-200 
-                ${userVote === "UPVOTE"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "bg-primary/10 text-primary hover:bg-primary/20"
+                ${
+                  userVote === "UPVOTE"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-primary/10 text-primary hover:bg-primary/20"
                 }`}
             >
               👍 {blogPost.upvotes}
@@ -923,9 +1000,10 @@ const BlogPostDetail: React.FC = () => {
             <button
               onClick={() => handleVote("DOWNVOTE")}
               className={`inline-flex items-center px-4 py-2 rounded-md transition-colors duration-200
-                ${userVote === "DOWNVOTE"
-                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  : "bg-destructive/10 text-destructive hover:bg-destructive/20"
+                ${
+                  userVote === "DOWNVOTE"
+                    ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    : "bg-destructive/10 text-destructive hover:bg-destructive/20"
                 }`}
             >
               👎 {blogPost.downvotes}
@@ -942,7 +1020,9 @@ const BlogPostDetail: React.FC = () => {
 
       {/* Comments Section */}
       <div className="bg-card rounded-lg shadow-md p-6 border border-border">
-        <h2 className="text-xl font-bold text-card-foreground mb-6">Comments</h2>
+        <h2 className="text-xl font-bold text-card-foreground mb-6">
+          Comments
+        </h2>
 
         <div className="flex items-center mb-6">
           {isAdmin && (
@@ -972,15 +1052,19 @@ const BlogPostDetail: React.FC = () => {
               className="bg-background border border-border rounded-md px-3 py-1 text-foreground focus:ring-2 focus:ring-ring transition-colors duration-200"
             >
               <option value="desc">
-                {sortBy === "reports" ? "Most reported first" : "Highest rating"}
+                {sortBy === "reports"
+                  ? "Most reported first"
+                  : "Highest rating"}
               </option>
               <option value="asc">
-                {sortBy === "reports" ? "Least reported first" : "Lowest rating"}
+                {sortBy === "reports"
+                  ? "Least reported first"
+                  : "Lowest rating"}
               </option>
             </select>
           </div>
         </div>
-        
+
         {/* New Comment Form */}
         <div className="mb-6">
           <textarea
@@ -1001,7 +1085,7 @@ const BlogPostDetail: React.FC = () => {
           {blogPost.comments.length > 0 ? (
             <div className="space-y-6">
               {blogPost.comments
-                .filter(comment => comment.parentId === null)
+                .filter((comment) => comment.parentId === null)
                 .map((comment) => (
                   <CommentComponent
                     key={comment.id}
@@ -1047,7 +1131,7 @@ const BlogPostDetail: React.FC = () => {
             await handleReport(content);
           }
         }}
-        type={reportingCommentId ? 'comment' : 'post'}
+        type={reportingCommentId ? "comment" : "post"}
       />
     </div>
   );

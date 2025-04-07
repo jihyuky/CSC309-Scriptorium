@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import axios from "axios";
-import UserAvatar from "@/pages/components/user-avatar";
+import UserAvatar from "../../components/user-avatar";
 
 export default function TemplatesPage() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function TemplatesPage() {
       title: string;
       explanation: string;
       tags: string;
-      user: { id: number; firstName: string; lastName: string, avatar: string };
+      user: { id: number; firstName: string; lastName: string; avatar: string };
     }[]
   >([]);
   const [searchParams, setSearchParams] = useState<{
@@ -172,13 +172,17 @@ export default function TemplatesPage() {
       >
         Scriptorium
       </h1>
-      <h2 className="text-2xl font-bold mb-4 text-foreground">Code Templates</h2>
+      <h2 className="text-2xl font-bold mb-4 text-foreground">
+        Code Templates
+      </h2>
 
       {/* Search Filters */}
       <div className="bg-card rounded-lg shadow-md p-6 mb-8 border border-border">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-muted-foreground">Title</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              Title
+            </label>
             <input
               type="text"
               placeholder="Search by title"
@@ -188,17 +192,23 @@ export default function TemplatesPage() {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-muted-foreground">Explanation</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              Explanation
+            </label>
             <input
               type="text"
               placeholder="Search by explanation"
               value={searchParams.explanation}
-              onChange={(e) => handleSearchChange("explanation", e.target.value)}
+              onChange={(e) =>
+                handleSearchChange("explanation", e.target.value)
+              }
               className="w-full p-2 bg-background border border-border rounded-md focus:ring-2 focus:ring-ring text-foreground placeholder:text-muted-foreground transition-colors duration-200"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-muted-foreground">Tags</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              Tags
+            </label>
             <input
               type="text"
               placeholder="Search by tag"
@@ -285,7 +295,9 @@ export default function TemplatesPage() {
             Page {currentPage} of {totalPages}
           </span>
           <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
             className={`px-4 py-2 rounded-md transition-colors duration-200 ${
               currentPage === totalPages
